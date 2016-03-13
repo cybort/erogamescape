@@ -1,13 +1,15 @@
 import requests
 import sys
+import re
 from bs4 import BeautifulSoup
 from .exception import *
 
-ERSCAPE_GAME_URL = 'http://erogamescape.dyndns.org/~ap2/ero/toukei_kaiseki/game.php?game={0}'
+GAME_URL = 'http://erogamescape.dyndns.org/~ap2/ero/toukei_kaiseki/game.php?game={0}'
+POV_URL = 'http://erogamescape.dyndns.org/~ap2/ero/toukei_kaiseki/game_pov.php?game={0}'
 
 
 def get_game(id):
-    response = requests.get(ERSCAPE_GAME_URL.format(id))
+    response = requests.get(GAME_URL.format(id))
     if response.status_code == 404:
         raise NotFoundError
     html = response.content
@@ -33,7 +35,11 @@ def get_game(id):
         'genga': [item.get_text() for item in soup.find(id='genga').find_all('a')] if soup.find(id='genga') is not None else None,
         'shinario': [item.get_text() for item in soup.find(id='shinario').find_all('a')] if soup.find(id='shinario') is not None else None,
         'seiyu': [item.get_text() for item in soup.find(id='seiyu').find_all('a')] if soup.find(id='seiyu') is not None else None,
-        'pov': [item.get_text() for item in soup.find(id='att_pov_table').find_all('a')] if soup.find(id='att_pov_table') is not None else None
     }
 
+    response = requests.get(POV_URL.format(id))
+    html = response.content
+    soup = BeautifulSoup(html, 'lxml')
+    game['pov'] = [item.get_text()
+                   for item in soup.find(class_='coment').find_all('a', href=re.compile('povlist.php'))]
     return game

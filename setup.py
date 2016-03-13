@@ -10,7 +10,7 @@ with open(path.join(here, 'README.rst'), encoding='utf-8') as f:
 
 setup(
     name='erogamescape',
-    version='0.0.1',
+    version='0.0.2',
     description='erogamescape api for python',
     long_description=long_description,
     url='http://github.com/roronya/erogamescape',
